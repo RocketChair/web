@@ -66,7 +66,7 @@ isIotData = (data) => {
 }
 
 isTips = (data) => {
-    return data && data.type === "data" && data.source === "tips";
+    return data && data.type === "data" && data.source === "iot";
 }
 
 pushIotData = (iotData) => {
@@ -96,8 +96,15 @@ getLayout = (title) => {
     }
 }
 createPush = () => {
-    // Push.create('Hello World!');
-    var n = new Notification('title');
+    Push.create('Hello world!', {
+        body: 'How\'s it hangin\'?',
+        icon: 'icon.png',
+        timeout: 4000,
+        onClick: function () {
+            console.log("Fired!");
+            window.focus();
+            this.close();
+        },
+        vibrate: [200, 100, 200, 100, 200, 100, 200]
+    });
 }
-
-Notification.requestPermission();

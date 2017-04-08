@@ -55,9 +55,10 @@ ws.onmessage = (evt) => {
         Plotly.newPlot('humidityAndTemperature', [humidityData, temperatureData], getLayout("Temperature and humidity"));
         Plotly.newPlot('light', [lightData], getLayout("Light"));
         Plotly.newPlot('pm', [pm01, pm25, pm10], getLayout("PM"));
-    } else if (isTips()) {
-        console.log('CIEMNOSC!!!');
-        createPush();
+    } else if (isTips(data)) {
+        createPush(data.data);
+    } else if (isAlert(data)){
+        notify(data.message);
     }
 }
 
@@ -66,7 +67,11 @@ isIotData = (data) => {
 }
 
 isTips = (data) => {
-    return data && data.type === "data" && data.source === "iot";
+    return data && data.type === "tips";
+}
+
+isAlert = (data) => {
+    return data && data.type === "ALERT";
 }
 
 pushIotData = (iotData) => {
@@ -95,10 +100,30 @@ getLayout = (title) => {
         showlegend: true
     }
 }
-createPush = () => {
-    Push.create('Hello world!', {
-        body: 'How\'s it hangin\'?',
-        icon: 'icon.png',
+createPush = (key) => {
+    let message;
+    switch (key) {
+        case 'TO_DARK':
+            message = 'Consider turning on light or you may come blind!'
+            break;
+        case 'TO_BRIGHT':
+            message = 'Wear sunglasses!'
+        case 'TO_HOT':
+            message = 'Consider opening window or wear bikini!'
+            break;
+        case 'TO_COLD':
+            message = 'Consider holidays on Bahama beach!'
+            break;
+        default:
+            message = 'Sorry, there is no hope for you!'
+    }
+    notify(message);
+}
+
+notify = (message) => {
+    Push.create(message, {
+        body: 'Rocket chair rules!',
+        icon: 'foguete.png',
         timeout: 4000,
         onClick: function () {
             console.log("Fired!");
